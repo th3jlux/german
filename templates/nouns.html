@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Nouns</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Nouns</h1>
+    
+    <div class="main-container">
+        <div id="categories">
+            <h3>Select Categories</h3>
+            {% for category in categories %}
+            <label><input type="checkbox" name="category" value="{{ category }}"> {{ category }}</label>
+            {% endfor %}
+            <button onclick="loadWords()">Show Words</button>
+        </div>
+        
+        <div class="flip-card-container" id="flip-cards">
+            <button class="nav-button left" onclick="prevWord()">Previous</button>
+            <div class="flip-card" onclick="flipCard()">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front" id="flip-card-front">English</div>
+                    <div class="flip-card-back" id="flip-card-back">German</div>
+                </div>
+            </div>
+            <button class="nav-button right" onclick="nextWord()">Next</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/nouns.js') }}"></script>
+</body>
+</html>
