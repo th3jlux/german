@@ -170,4 +170,25 @@ h1 {
     transition: color 0.3s ease;
 }
 
+#special-characters {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+#special-characters button {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#special-characters button:hover {
+    background-color: #e0e0e0;
+}
+
+
 

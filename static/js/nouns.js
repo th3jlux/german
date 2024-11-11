@@ -2,6 +2,26 @@ let words = [];
 let currentIndex = 0;
 let wordHistory = [];
 
+document.getElementById('select-all').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('input[name="category"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+});
+
+document.querySelectorAll('input[name="category"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const allChecked = Array.from(document.querySelectorAll('input[name="category"]'))
+            .every(cb => cb.checked);
+        const anyChecked = Array.from(document.querySelectorAll('input[name="category"]'))
+            .some(cb => cb.checked);
+
+        document.getElementById('select-all').checked = allChecked;
+        document.getElementById('select-all').indeterminate = !allChecked && anyChecked;
+    });
+});
+
+
 document.getElementById('guess-input').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         checkAnswer();
@@ -24,12 +44,28 @@ document.addEventListener('keydown', function (event) {
 
 let wordsAttempted = {}; // Track words to handle correct/incorrect attempts
 
+function insertCharacter(char) {
+    const input = document.getElementById('guess-input');
+    
+    // Insert character at the current cursor position
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const text = input.value;
+    input.value = text.substring(0, start) + char + text.substring(end);
+    
+    // Move cursor to the right of the inserted character
+    input.selectionStart = input.selectionEnd = start + 1;
+    
+    // Keep focus on the input field
+    input.focus();
+}
+
 function checkAnswer() {
     const input = document.getElementById('guess-input').value.trim();
     const feedback = document.getElementById('feedback');
     const currentWord = words[currentIndex];
     const correctArticle = getArticle(currentWord.gender);
-    const expectedAnswer = `${correctArticle} ${currentWord.german.toLowerCase()}`;
+    const expectedAnswer = `${correctArticle} ${currentWord.german.toLowerCase()}`.trim();
 
     if (input.toLowerCase() === expectedAnswer) {
         if (!wordsAttempted[currentWord.german]) {
@@ -58,7 +94,7 @@ function checkAnswer() {
             nextWord(); // Go to the next word without removing it
         }
     } else {
-        feedback.textContent = `Incorrect. Correct answer: ${correctArticle} ${currentWord.german}`;
+        feedback.textContent = `Incorrect. You entered: "${input}". Correct answer: "${correctArticle} ${currentWord.german}"`;;
         feedback.style.color = 'red';
         wordsAttempted[currentWord.german] = true; // Mark as attempted
     }

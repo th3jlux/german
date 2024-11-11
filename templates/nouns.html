@@ -10,6 +10,7 @@
     <div class="main-container">
         <div id="categories">
             <h3>Select Categories</h3>
+            <label><input type="checkbox" id="select-all"> Select All</label>
             {% for category in categories %}
             <label><input type="checkbox" name="category" value="{{ category }}"> {{ category }}</label>
             {% endfor %}
@@ -31,6 +32,12 @@
             <input type="text" id="guess-input" placeholder="Type the German word..." />
             <button onclick="checkAnswer()">Submit</button>
             <p id="feedback" class="feedback"></p>
+            <div id="special-characters">
+                <button type="button" onclick="insertCharacter('ä')">ä</button>
+                <button type="button" onclick="insertCharacter('ö')">ö</button>
+                <button type="button" onclick="insertCharacter('ü')">ü</button>
+                <button type="button" onclick="insertCharacter('ß')">ß</button>
+            </div>
         </div>
 
     </div>
