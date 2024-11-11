@@ -2,8 +2,17 @@ let words = [];
 let currentIndex = 0;
 let wordHistory = [];
 
+document.getElementById('guess-input').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        checkAnswer();
+        event.preventDefault();
+    }
+});
+
 document.addEventListener('keydown', function (event) {
-    if (event.code === 'Space') {
+    const inputFocused = document.activeElement.id === 'guess-input';
+    
+    if (event.code === 'Space' && !inputFocused) {
         flipCard();
         event.preventDefault();
     } else if (event.code === 'ArrowLeft') {
@@ -12,6 +21,102 @@ document.addEventListener('keydown', function (event) {
         nextWord();
     }
 });
+
+let wordsAttempted = {}; // Track words to handle correct/incorrect attempts
+
+function checkAnswer() {
+    const input = document.getElementById('guess-input').value.trim();
+    const feedback = document.getElementById('feedback');
+    const currentWord = words[currentIndex];
+    const correctArticle = getArticle(currentWord.gender);
+    const expectedAnswer = `${correctArticle} ${currentWord.german.toLowerCase()}`;
+
+    if (input.toLowerCase() === expectedAnswer) {
+        if (!wordsAttempted[currentWord.german]) {
+            feedback.textContent = 'Correct!';
+            feedback.style.color = 'green';
+
+            // Remove word from list since it is correct on the first attempt (this time)
+            words.splice(currentIndex, 1);
+            delete wordsAttempted[currentWord.german];
+
+            if (words.length === 0) {
+                feedback.textContent = 'Congratulations! You have completed all words!';
+                document.getElementById('flip-card-front').innerText = '';
+                document.getElementById('flip-card-back').innerText = '';
+                return;
+            }
+
+            if (currentIndex >= words.length) {
+                currentIndex = 0;
+            }
+            nextWord();
+        } else {
+            feedback.textContent = 'Correct, but this word will appear again!';
+            feedback.style.color = 'orange';
+            delete wordsAttempted[currentWord.german];
+            nextWord(); // Go to the next word without removing it
+        }
+    } else {
+        feedback.textContent = `Incorrect. Correct answer: ${correctArticle} ${currentWord.german}`;
+        feedback.style.color = 'red';
+        wordsAttempted[currentWord.german] = true; // Mark as attempted
+    }
+
+    document.getElementById('guess-input').value = ''; // Clear input
+}
+
+function getArticle(gender) {
+    switch (gender) {
+        case 'M': return 'der';
+        case 'F': return 'die';
+        case 'N': return 'das';
+        default: return '';
+    }
+}
+
+function showWord() {
+    if (words.length === 0) return;
+
+    const cardInner = document.querySelector('.flip-card-inner');
+    cardInner.style.transition = 'none'; // Disable animation temporarily
+
+    resetCard(); // Reset to the English side before setting new content
+
+    setTimeout(() => {
+        const word = words[currentIndex];
+        const genderClass = word.gender === 'M' ? 'blue' : word.gender === 'N' ? 'green' : 'red';
+
+        document.getElementById('flip-card-front').innerText = word.english;
+        document.getElementById('flip-card-back').innerText = word.german;
+        document.getElementById('flip-card-back').className = `flip-card-back ${genderClass}`;
+
+        setTimeout(() => {
+            cardInner.style.transition = ''; // Restore original CSS transition
+        }, 50);
+    }, 50); // Short delay before setting new content
+
+    document.getElementById('guess-input').focus();  // Automatically focus input
+}
+
+function nextWord() {
+    if (currentIndex < words.length - 1) {
+        currentIndex++;
+    } else {
+        currentIndex = 0;
+    }
+    showWord();
+}
+
+function prevWord() {
+    if (currentIndex > 0) {
+        currentIndex--;
+    } else {
+        currentIndex = words.length - 1;
+    }
+    showWord();
+}
+
 
 function loadWords() {
     const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked'))
@@ -39,28 +144,6 @@ function shuffleArray(array) {
     return array;
 }
 
-function showWord() {
-    if (words.length === 0) return;
-
-    const cardInner = document.querySelector('.flip-card-inner');
-    cardInner.style.transition = 'none'; // Disable animation temporarily
-    
-    resetCard(); // Reset to the English side before setting new content
-
-    setTimeout(() => {
-        const word = words[currentIndex];
-        const genderClass = word.gender === 'M' ? 'blue' : word.gender === 'N' ? 'green' : 'red';
-
-        document.getElementById('flip-card-front').innerText = word.english;
-        document.getElementById('flip-card-back').innerText = word.german;
-        document.getElementById('flip-card-back').className = `flip-card-back ${genderClass}`;
-        
-        // Re-enable animation after setting new content
-        setTimeout(() => {
-            cardInner.style.transition = ''; // Restore original CSS transition
-        }, 50);
-    }, 50); // Short delay before setting new content
-}
 
 
 function flipCard() {
@@ -71,19 +154,4 @@ function flipCard() {
 function resetCard() {
     const card = document.querySelector('.flip-card-inner');
     card.classList.remove('flipped'); // Ensure it starts on the German side
-}
-
-function nextWord() {
-    if (currentIndex < words.length - 1) {
-        wordHistory.push(currentIndex);
-        currentIndex++;
-        showWord();
-    }
-}
-
-function prevWord() {
-    if (wordHistory.length > 0) {
-        currentIndex = wordHistory.pop();
-        showWord();
-    }
 }

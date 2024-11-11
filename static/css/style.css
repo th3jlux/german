@@ -134,3 +134,40 @@ h1 {
 .nav-button.right {
     order: 1;
 }
+
+#word-input {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#guess-input {
+    padding: 8px;
+    width: 80%;
+    max-width: 300px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#word-input button {
+    padding: 8px 16px;
+    background-color: #4A90E2;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#word-input button:hover {
+    background-color: #357ABD;
+}
+
+.feedback {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+

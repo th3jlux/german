@@ -6,6 +6,9 @@
 </head>
 <body>
     <h1>Welcome to German Learning App</h1>
-    <a href="{{ url_for('nouns') }}"><button>Nouns</button></a>
+    <div id="categories">
+        <a href="{{ url_for('nouns') }}"><button>Nouns</button></a>
+        <a href="{{ url_for('nouns') }}"><button>Numbers</button></a>
+    </div>
 </body>
 </html>

@@ -26,6 +26,13 @@
             </div>
             <button class="nav-button right" onclick="nextWord()">Next</button>
         </div>
+
+        <div id="word-input">
+            <input type="text" id="guess-input" placeholder="Type the German word..." />
+            <button onclick="checkAnswer()">Submit</button>
+            <p id="feedback" class="feedback"></p>
+        </div>
+
     </div>
 
     <script src="{{ url_for('static', filename='js/nouns.js') }}"></script>
