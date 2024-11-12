@@ -144,6 +144,22 @@ function nextWord() {
     showWord();
 }
 
+function toggleCategories() {
+    const categoriesDiv = document.getElementById('categories');
+    const collapseButton = document.getElementById('collapse-button');
+    const elementsToToggle = categoriesDiv.querySelectorAll('h3, label, button:not(#collapse-button)');
+
+    // Toggle visibility of all elements except the collapse button
+    elementsToToggle.forEach(element => {
+        element.style.display = element.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Toggle button text between + and −
+    collapseButton.textContent = collapseButton.textContent === '−' ? '+' : '−';
+}
+
+
+
 function prevWord() {
     if (currentIndex > 0) {
         currentIndex--;

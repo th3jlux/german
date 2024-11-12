@@ -1,5 +1,13 @@
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
+import re
+\
+
+def sort_key(value):
+    # Extract numbers from the string for sorting
+    numbers = re.findall(r'\d+', value)
+    return (int(numbers[0]) if numbers else float('inf'), value)
+
 
 app = Flask(__name__)
 
@@ -13,7 +21,7 @@ def home():
 @app.route('/nouns')
 def nouns():
     # Get unique categories from the data
-    categories = df['category'].unique()
+    categories = sorted(df['category'].unique(), key=sort_key)
     return render_template('nouns.html', categories=categories)
 
 @app.route('/get_words', methods=['POST'])
