@@ -173,3 +173,30 @@ button:hover {
     gap: 10px;
     justify-content: center;
 }
+
+
+#error-list {
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 80%;
+}
+
+#error-list h3 {
+    margin-bottom: 10px;
+    color: #d9534f;
+}
+
+#error-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#error-list li {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #d9534f;
+}

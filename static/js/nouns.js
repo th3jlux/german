@@ -1,6 +1,8 @@
 let words = [];
 let currentIndex = 0;
 let wordHistory = [];
+let incorrectWords = [];
+
 
 document.getElementById('select-all').addEventListener('change', function() {
     const checkboxes = document.querySelectorAll('input[name="category"]');
@@ -97,9 +99,21 @@ function checkAnswer() {
         feedback.textContent = `Incorrect. You entered: "${input}". Correct answer: "${correctArticle} ${currentWord.german}"`;;
         feedback.style.color = 'red';
         wordsAttempted[currentWord.german] = true; // Mark as attempted
+
+        if (!incorrectWords.includes(expectedAnswer)) {
+            incorrectWords.push(expectedAnswer);
+            addToErrorList(expectedAnswer);
+        }
     }
 
     document.getElementById('guess-input').value = ''; // Clear input
+}
+
+function addToErrorList(word) {
+    const errorsList = document.getElementById('errors');
+    const listItem = document.createElement('li');
+    listItem.textContent = word;
+    errorsList.appendChild(listItem);
 }
 
 function getArticle(gender) {
