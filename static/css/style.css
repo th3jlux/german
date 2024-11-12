@@ -13,30 +13,48 @@ h1 {
     color: #4A90E2;
 }
 
-.collapse-controls {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 10px;
-}
-
-#collapse-button {
+/* General Button Styles */
+button {
+    padding: 8px 16px;
     background-color: #4A90E2;
-    color: white;
+    color: #fff;
     border: none;
     border-radius: 4px;
-    font-size: 20px;
     cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #357ABD;
+}
+
+/* Specific Button Overrides */
+#collapse-button {
+    font-size: 20px;
     width: 30px;
     height: 30px;
     text-align: center;
     line-height: 20px;
+    padding: 0;
 }
 
-#collapse-button:hover {
-    background-color: #357ABD;
+.nav-button {
+    font-size: 14px;
+    padding: 8px 12px;
 }
 
+.nav-button.left {
+    order: -1;
+}
 
+.nav-button.right {
+    order: 1;
+}
+
+#special-characters button {
+    font-size: 16px;
+    border: 1px solid #ccc;
+}
 
 /* Main Container Layout */
 .main-container {
@@ -64,19 +82,10 @@ h1 {
     cursor: pointer;
 }
 
-#categories button {
-    margin-top: 10px;
-    padding: 8px 16px;
-    background-color: #4A90E2;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#categories button:hover {
-    background-color: #357ABD;
+.collapse-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
 }
 
 /* Flip Card Styles */
@@ -136,30 +145,7 @@ h1 {
 .green { background-color: #D0FFD6; color: green; }
 .red { background-color: #FFD6D6; color: red; }
 
-/* Navigation Buttons */
-.nav-button {
-    padding: 8px 12px;
-    background-color: #4A90E2;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    z-index: 1;
-}
-
-.nav-button:hover {
-    background-color: #357ABD;
-}
-
-.nav-button.left {
-    order: -1;
-}
-
-.nav-button.right {
-    order: 1;
-}
-
+/* Input Section */
 #word-input {
     margin-top: 20px;
     text-align: center;
@@ -172,20 +158,6 @@ h1 {
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 4px;
-}
-
-#word-input button {
-    padding: 8px 16px;
-    background-color: #4A90E2;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#word-input button:hover {
-    background-color: #357ABD;
 }
 
 .feedback {
@@ -201,19 +173,3 @@ h1 {
     gap: 10px;
     justify-content: center;
 }
-
-#special-characters button {
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    background-color: #4A90E2;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-#special-characters button:hover {
-    background-color: #357ABD;
-}
-
-
-
