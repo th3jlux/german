@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Fill in the Blanks</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Fill in the Blanks</h1>
+    
+    <!-- Collapsible Dropdown -->
+    <div id="dropdown-section">
+        <button id="toggle-dropdown">Select Filters</button>
+        <div id="dropdown-content" class="hidden">
+            <div>
+                <h3>Case</h3>
+                <select id="unique-case">
+                    <option value="">All</option>
+                    {% for value in unique_cases %}
+                        <option value="{{ value }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <h3>Type</h3>
+                <select id="unique-type">
+                    <option value="">All</option>
+                    {% for value in unique_types %}
+                        <option value="{{ value }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Display Area -->
+    <div id="display-section">
+        <div id="english-text" class="text-display">English text will appear here.</div>
+        <div id="german-text" class="text-display">German text will appear here.</div>
+    </div>
+
+    <!-- Input for Guessing -->
+    <div id="word-input">
+            <input type="text" id="guess-input" placeholder="Type the missing word..." />
+            <button onclick="checkAnswer()">Submit</button>
+            <p id="feedback" class="feedback"></p>
+    </div>
+
+    <div class="feedback" id="feedback">Feedback will appear here.</div>
+
+
+    <script src="{{ url_for('static', filename='js/fill_blanks.js') }}"></script>
+</body>
+</html>
