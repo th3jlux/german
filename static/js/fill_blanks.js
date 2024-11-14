@@ -89,17 +89,35 @@ function checkAnswer() {
 
     if (input === correctArticle) {
         score.correct++;
-        feedback.textContent = "Correct!";
+        // Insert the correct article into the German sentence
+        englishText = document.getElementById('english-text').textContent
+        germanText = document.getElementById('german-text').textContent 
+        const fullGermanSentence = germanText.replace('[ ]', `<b><u>${correctArticle}</u></b>`);
+        feedback.innerHTML = `
+            Correct. ${correctArticle}<br>
+            <strong>English:</strong> ${englishText}<br>
+            <strong>German:</strong> ${fullGermanSentence}
+        `;
+        feedback.innerHTML = `Correct. ${correctArticle}<br>Full sentence: ${fullGermanSentence}`;
         feedback.className = "feedback correct";
     } else {
         score.incorrect++;
-        feedback.textContent = `Incorrect. The correct answer is: ${correctArticle}`;
+        // Insert the correct article into the German sentence
+        englishText = document.getElementById('english-text').textContent
+        germanText = document.getElementById('german-text').textContent 
+        const fullGermanSentence = germanText.replace('[ ]', `<b><u>${correctArticle}</u></b>`);
+        feedback.innerHTML = `
+            Incorrect. The correct answer is: ${correctArticle}<br>
+            <strong>English:</strong> ${englishText}<br>
+            <strong>German:</strong> ${fullGermanSentence}
+        `;
         feedback.className = "feedback incorrect";
     }
 
     updateScore();  // Update the score display
     nextPhrase();   // Move to the next phrase
 }
+
 
 function nextPhrase() {
     currentPhraseIndex++;

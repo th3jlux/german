@@ -213,7 +213,11 @@ button:hover {
     position: sticky;
     top: 0;
     z-index: 1000;
+    width: 100%; /* Ensure it covers the full width of the screen */
+    left: 0; /* Ensures alignment on wider screens */
+    border-bottom: 2px solid #357ABD; /* Adds a small bottom border */
 }
+
 
 .menu-item {
     margin: 0 10px;

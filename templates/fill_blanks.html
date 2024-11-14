@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    
     <header class="top-menu">
         <div class="menu-item">
             <div id="case-dropdown">
@@ -15,6 +16,9 @@
                 {% endfor %}
             </div>
         </div>
+
+    </header>
+    <header class="top-menu">
         <div class="menu-item">
             <div id="type-dropdown">
                 <h3>Select Type</h3>
@@ -24,9 +28,13 @@
                 {% endfor %}
             </div>
         </div>
-        <button class="menu-item styled-button" onclick="loadPhrase()">Load Phrase</button>
+
     </header>
 
+    <header class="top-menu">
+        <button class="menu-item styled-button" onclick="loadPhrase()">Load Phrase</button>
+
+    </header>
     <main id="main-content" class="hidden">
         <h1>Fill in the Blanks</h1>
 
