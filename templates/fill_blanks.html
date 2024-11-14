@@ -5,49 +5,44 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Fill in the Blanks</h1>
-    
-    <!-- Collapsible Dropdown -->
-    <div id="dropdown-section">
-        <button id="toggle-dropdown">Select Filters</button>
-        <div id="dropdown-content" class="hidden">
-            <div>
-                <h3>Case</h3>
-                <select id="unique-case">
-                    <option value="">All</option>
-                    {% for value in unique_cases %}
-                        <option value="{{ value }}">{{ value }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <h3>Type</h3>
-                <select id="unique-type">
-                    <option value="">All</option>
-                    {% for value in unique_types %}
-                        <option value="{{ value }}">{{ value }}</option>
-                    {% endfor %}
-                </select>
+    <header class="top-menu">
+        <div class="menu-item">
+            <div id="case-dropdown">
+                <h3>Select Case</h3>
+                <label><input type="checkbox" id="case-select-all" checked> Select All</label>
+                {% for value in unique_cases %}
+                <label><input type="checkbox" name="case" value="{{ value }}" checked> {{ value }}</label>
+                {% endfor %}
             </div>
         </div>
-    </div>
+        <div class="menu-item">
+            <div id="type-dropdown">
+                <h3>Select Type</h3>
+                <label><input type="checkbox" id="type-select-all" checked> Select All</label>
+                {% for value in unique_types %}
+                <label><input type="checkbox" name="type" value="{{ value }}" checked> {{ value }}</label>
+                {% endfor %}
+            </div>
+        </div>
+        <button class="menu-item styled-button" onclick="loadPhrase()">Load Phrase</button>
+    </header>
 
+    <main id="main-content" class="hidden">
+        <h1>Fill in the Blanks</h1>
 
-    <!-- Display Area -->
-    <div id="display-section">
-        <div id="english-text" class="text-display">English text will appear here.</div>
-        <div id="german-text" class="text-display">German text will appear here.</div>
-    </div>
+        <div id="display-section">
+            <div id="english-text" class="text-display"></div>
+            <div id="german-text" class="text-display"></div>
+        </div>
 
-    <!-- Input for Guessing -->
-    <div id="word-input">
-            <input type="text" id="guess-input" placeholder="Type the missing word..." />
+        <div id="word-input">
+            <input type="text" id="guess-input" placeholder="Enter the correct article" />
             <button onclick="checkAnswer()">Submit</button>
             <p id="feedback" class="feedback"></p>
-    </div>
+        </div>
 
-    <div class="feedback" id="feedback">Feedback will appear here.</div>
-
+        <div id="score" class="score-display">Correct: 0 | Incorrect: 0</div>
+    </main>
 
     <script src="{{ url_for('static', filename='js/fill_blanks.js') }}"></script>
 </body>

@@ -44,26 +44,25 @@ def fill_blanks():
 @app.route('/get_random_phrase', methods=['POST'])
 def get_random_phrase():
     filters = request.json
-    case_filter = filters.get('case')
-    type_filter = filters.get('type')
+    case_filter = filters.get('case', [])
+    type_filter = filters.get('type', [])
 
+    # Start with the entire DataFrame
     filtered_df = fill_blanks_df
+
+    # Filter based on the case and type selections
     if case_filter:
-        filtered_df = filtered_df[filtered_df['case'] == case_filter]
+        filtered_df = filtered_df[filtered_df['case'].isin(case_filter)]
     if type_filter:
-        filtered_df = filtered_df[filtered_df['type'] == type_filter]
+        filtered_df = filtered_df[filtered_df['type'].isin(type_filter)]
 
     if not filtered_df.empty:
-        random_row = filtered_df.sample(1).iloc[0]
-        english_phrase = random_row['english']
-        german_phrase = random_row['german']
-        correct_article = random_row['article']  # Include the article
+        phrases = filtered_df.to_dict(orient='records')
     else:
-        english_phrase = "No matching data"
-        german_phrase = "Keine passenden Daten"
-        correct_article = ""
+        phrases = []
 
-    return jsonify({'english': english_phrase, 'german': german_phrase, 'article': correct_article})
+    return jsonify({'phrases': phrases})
+
 
 
 

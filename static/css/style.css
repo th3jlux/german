@@ -201,36 +201,191 @@ button:hover {
     color: #d9534f;
 }
 
-/* Fill in the Blanks Specific Styles */
-#dropdown-section {
-    margin: 20px 0;
+/* Top Menu Bar */
+.top-menu {
+    background-color: #4A90E2;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-#toggle-dropdown {
-    margin-bottom: 10px;
+.menu-item {
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+}
+
+.menu-item label {
+    margin-right: 5px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.menu-item select {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.menu-item button {
+    background-color: #357ABD;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.menu-item button:hover {
+    background-color: #285a8d;
+}
+
+/* Main Section */
+main {
+    margin-top: 20px;
+    text-align: center;
 }
 
 .hidden {
     display: none;
 }
 
-#dropdown-content {
-    background-color: #fff;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 10px;
-}
-
 .text-display {
-    margin: 10px 0;
+    margin: 15px 0;
     padding: 10px;
     background-color: #f4f4f4;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 18px;
-    width: 80%;
+}
+
+
+#word-input {
+    margin-top: 20px;
+}
+
+#guess-input {
+    padding: 8px;
+    width: 50%;
+    max-width: 300px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.feedback {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.feedback.correct {
+    color: green;
+}
+
+.feedback.incorrect {
+    color: red;
+}
+
+/* Stylish Dropdowns */
+.styled-select {
+    appearance: none;  /* Remove default dropdown arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 4px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.styled-select:hover {
+    border-color: #357ABD;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.styled-select:focus {
+    outline: none;
+    border-color: #4A90E2;
+    box-shadow: 0px 4px 12px rgba(74, 144, 226, 0.5);
+}
+
+/* Add a custom arrow for the dropdown */
+.styled-select::after {
+    content: '▼'; /* Unicode arrow character */
+    position: absolute;
+    right: 10px;
+    top: calc(50% - 5px);
+    font-size: 12px;
+    pointer-events: none;
+    color: #333;
+}
+
+/* Stylish Button */
+.styled-button {
+    background-color: #4A90E2;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.styled-button:hover {
+    background-color: #357ABD;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.styled-button:focus {
+    outline: none;
+    background-color: #285a8d;
+}
+
+.score-display {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
     text-align: center;
+}
+
+.multi-select-dropdown {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.multi-select-dropdown label {
+    display: block;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.multi-select-dropdown input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+#unique-case, #unique-type {
+    width: 250px;
+    margin-top: 5px;
 }
 
