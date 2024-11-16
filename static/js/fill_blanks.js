@@ -117,6 +117,7 @@ function checkAnswer() {
 
 function displaySavedRules(phraseText) {
     const rules = savedRules[phraseText] || [];
+    const currentCase = phrases[currentPhraseIndex]?.case; // Get the case for the current phrase
     const table = document.getElementById('rules-table');
 
     table.innerHTML = `
@@ -128,7 +129,7 @@ function displaySavedRules(phraseText) {
             <th><em>Plural</em></th>
         </tr>
         ${rules.map(rule => `
-            <tr>
+            <tr style="${rule.case === currentCase ? 'font-weight: bold;' : ''}">
                 <td><em>${rule.case}</em></td>
                 <td><em>${rule.masculine}</em></td>
                 <td><em>${rule.feminine}</em></td>
@@ -138,6 +139,7 @@ function displaySavedRules(phraseText) {
     `;
     toggleVisibility('rules-section', true);
 }
+
 
 
 function nextPhrase() {
