@@ -1,38 +1,37 @@
-let correctArticle = "";  // Store the correct article globally
-let score = { correct: 0, incorrect: 0 };  // Initialize score
-let phrases = [];  // Store randomized phrases
-let currentPhraseIndex = 0;  // Track current phrase index
+let correctArticle = "";  
+let score = { correct: 0, incorrect: 0 };  
+let phrases = [];  
+let currentPhraseIndex = 0;  
+let savedRules = {};  // Store rules for each phrase
 
-document.addEventListener('DOMContentLoaded', initializeApp);
+document.addEventListener('DOMContentLoaded', () => {
+    setupCheckboxGroups(['case', 'type']);
+    setupEnterKeyListener('guess-input', checkAnswer);
+});
 
-function initializeApp() {
-    setupSelectAll('case');
-    setupSelectAll('type');
-    setupInputListener();
+function setupCheckboxGroups(groups) {
+    groups.forEach(group => {
+        const selectAll = document.getElementById(`${group}-select-all`);
+        const checkboxes = document.querySelectorAll(`input[name="${group}"]`);
+
+        selectAll.addEventListener('change', () => {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        });
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
+            });
+        });
+    });
 }
 
-function setupInputListener() {
-    const input = document.getElementById('guess-input');
-    input.addEventListener('keypress', (event) => {
+function setupEnterKeyListener(inputId, callback) {
+    document.getElementById(inputId).addEventListener('keypress', event => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            checkAnswer();
+            callback();
         }
-    });
-}
-
-function setupSelectAll(group) {
-    const selectAllCheckbox = document.getElementById(`${group}-select-all`);
-    const checkboxes = document.querySelectorAll(`input[name="${group}"]`);
-
-    selectAllCheckbox.addEventListener('change', () => {
-        checkboxes.forEach(cb => cb.checked = selectAllCheckbox.checked);
-    });
-
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', () => {
-            selectAllCheckbox.checked = Array.from(checkboxes).every(cb => cb.checked);
-        });
     });
 }
 
@@ -42,72 +41,45 @@ function getSelectedValues(group) {
 }
 
 function loadPhrase() {
-    const caseValues = getSelectedValues('case');
-    const typeValues = getSelectedValues('type');
+    const filters = { case: getSelectedValues('case'), type: getSelectedValues('type') };
 
-    if (!caseValues.length || !typeValues.length) {
+    if (!filters.case.length || !filters.type.length) {
         return alert("Please select at least one filter in both dropdowns.");
     }
 
     fetch('/get_random_phrase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ case: caseValues, type: typeValues })
+        body: JSON.stringify(filters)
     })
     .then(response => response.json())
     .then(data => {
         phrases = shuffleArray(data.phrases);
         currentPhraseIndex = 0;
-        showPhrase(phrases[currentPhraseIndex]);
+        saveAndDisplayPhrase();
     })
     .catch(handleError('Error loading phrases'));
 }
 
-function showPhrase(phrase) {
-    setElementText('english-text', phrase.english);
-    setElementText('german-text', phrase.german);
+function saveAndDisplayPhrase() {
+    const phrase = phrases[currentPhraseIndex];
+    if (!phrase) return;
+
+    setText('english-text', phrase.english);
+    setText('german-text', phrase.german);
     correctArticle = phrase.article;
 
-    toggleElementVisibility('main-content', true);
-
-    loadRules(phrase.type, phrase.case);
-}
-
-function loadRules(type, sentenceCase) {
     fetch('/get_fill_blank_rules', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type })
+        body: JSON.stringify({ type: phrase.type })
     })
     .then(response => response.json())
-    .then(data => displayRules(data.rules, sentenceCase))
+    .then(data => {
+        savedRules[phrase.german] = data.rules;  // Save rules for the current phrase
+        toggleVisibility('main-content', true);
+    })
     .catch(handleError("Error fetching rules"));
-}
-
-function displayRules(rules, sentenceCase) {
-    const rulesTable = document.getElementById('rules-table');
-    rulesTable.innerHTML = `
-        <tr>
-            <th>Case</th>
-            <th>Masculine</th>
-            <th>Neuter</th>
-            <th>Feminine</th>
-            <th>Plural</th>
-        </tr>
-    `;
-
-    rules.forEach(rule => {
-        const isHighlighted = rule.case === sentenceCase;
-        rulesTable.innerHTML += `
-            <tr ${isHighlighted ? 'style="font-weight: bold;"' : ''}>
-                <td>${rule.case}</td>
-                <td>${rule.masculine}</td>
-                <td>${rule.neuter}</td>
-                <td>${rule.feminine}</td>
-                <td>${rule.plural}</td>
-            </tr>
-        `;
-    });
 }
 
 function checkAnswer() {
@@ -115,41 +87,72 @@ function checkAnswer() {
     const feedback = document.getElementById('feedback');
     const englishText = document.getElementById('english-text').textContent;
     const germanText = document.getElementById('german-text').textContent;
-    const fullGermanSentence = germanText.replace('[ ]', `<b><u>${correctArticle}</u></b>`);
+
+    // Sentence with correct and user-provided articles
+    const correctSentence = germanText.replace('[ ]', `<b><u>${correctArticle}</u></b>`);
+    const userSentence = germanText.replace('[ ]', `<b><u>${input || "(nothing)"}</u></b>`);
 
     if (input === correctArticle) {
-        score.correct++;
-        feedback.className = "feedback correct";
-        feedback.innerHTML = `Correct. ${correctArticle}<br><strong>English:</strong> ${englishText}<br><strong>German:</strong> ${fullGermanSentence}`;
+        feedback.className = "feedback";
+        feedback.innerHTML = `
+            <span style="color: green;"><em>Correct!</em></span><br>
+            <em>The English sentence was: ${englishText}</em><br>
+            <em>You correctly entered: ${correctSentence}</em>
+        `;
     } else {
-        score.incorrect++;
-        feedback.className = "feedback incorrect";
-        feedback.innerHTML = `Incorrect. The correct answer is: ${correctArticle}<br><strong>English:</strong> ${englishText}<br><strong>German:</strong> ${fullGermanSentence}`;
+        feedback.className = "feedback";
+        feedback.innerHTML = `
+            <span style="color: red;"><em>Incorrect.</em></span><br>
+            <em>The English sentence was: ${englishText}</em><br>
+            <em>You entered: ${userSentence}</em><br>
+            <em>The correct answer is: ${correctSentence}</em>
+        `;
     }
 
-    showRulesSection();
     updateScore();
+    displaySavedRules(germanText);  // Display rules for the current phrase
     nextPhrase();
 }
+  
 
-function showRulesSection() {
-    const rulesSection = document.getElementById('rules-section');
-    rulesSection.style.display = 'block'; // Ensure it's visible
+function displaySavedRules(phraseText) {
+    const rules = savedRules[phraseText] || [];
+    const table = document.getElementById('rules-table');
+
+    table.innerHTML = `
+        <tr>
+            <th><em>Case</em></th>
+            <th><em>Masculine</em></th>
+            <th><em>Feminine</em></th>
+            <th><em>Neuter</em></th>
+            <th><em>Plural</em></th>
+        </tr>
+        ${rules.map(rule => `
+            <tr>
+                <td><em>${rule.case}</em></td>
+                <td><em>${rule.masculine}</em></td>
+                <td><em>${rule.feminine}</em></td>
+                <td><em>${rule.neuter}</em></td>
+                <td><em>${rule.plural}</em></td>
+            </tr>`).join('')}
+    `;
+    toggleVisibility('rules-section', true);
 }
 
 
 function nextPhrase() {
     if (++currentPhraseIndex < phrases.length) {
-        showPhrase(phrases[currentPhraseIndex]);
+        saveAndDisplayPhrase();
     } else {
         alert("You've completed all phrases!");
-        currentPhraseIndex = 0;  // Reset index for reuse
+        currentPhraseIndex = 0;
+        saveAndDisplayPhrase();
     }
-    document.getElementById('guess-input').value = "";  // Clear input
+    document.getElementById('guess-input').value = ""; 
 }
 
 function updateScore() {
-    setElementText('score', `Correct: ${score.correct} | Incorrect: ${score.incorrect}`);
+    setText('score', `Correct: ${score.correct} | Incorrect: ${score.incorrect}`);
 }
 
 function shuffleArray(array) {
@@ -160,13 +163,12 @@ function shuffleArray(array) {
     return array;
 }
 
-// Utility Functions
-function setElementText(id, text) {
+function setText(id, text) {
     document.getElementById(id).textContent = text;
 }
 
-function toggleElementVisibility(id, isVisible) {
-    document.getElementById(id).classList.toggle('hidden', !isVisible);
+function toggleVisibility(id, show) {
+    document.getElementById(id).style.display = show ? 'block' : 'none';
 }
 
 function handleError(message) {
