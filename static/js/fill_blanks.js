@@ -88,31 +88,49 @@ function checkAnswer() {
     const englishText = document.getElementById('english-text').textContent;
     const germanText = document.getElementById('german-text').textContent;
 
-    // Sentence with correct and user-provided articles
     const correctSentence = germanText.replace('[ ]', `<b><u>${correctArticle}</u></b>`);
     const userSentence = germanText.replace('[ ]', `<b><u>${input || "(nothing)"}</u></b>`);
 
     if (input === correctArticle) {
-        feedback.className = "feedback";
+        score.correct++;
+        feedback.className = "feedback correct";
         feedback.innerHTML = `
             <span style="color: green;"><em>Correct!</em></span><br>
             <em>The English sentence was: ${englishText}</em><br>
             <em>You correctly entered: ${correctSentence}</em>
         `;
-    } else {
-        feedback.className = "feedback";
-        feedback.innerHTML = `
-            <span style="color: red;"><em>Incorrect.</em></span><br>
-            <em>The English sentence was: ${englishText}</em><br>
-            <em>You entered: ${userSentence}</em><br>
-            <em>The correct answer is: ${correctSentence}</em>
-        `;
-    }
 
-    updateScore();
-    displaySavedRules(germanText);  // Display rules for the current phrase
-    nextPhrase();
+        updateScore();
+        displaySavedRules(germanText);  // Display rules for the current phrase
+        nextPhrase();
+    } else {
+        score.incorrect++;
+        feedback.className = "feedback incorrect";
+        feedback.innerHTML = `
+            <span style="color: red;"><em>Incorrect. Try Again</em></span><br>
+        `;
+
+        updateScore();
+        displaySavedRules(germanText);  // Display rules for the current phrase
+    }
 }
+
+function nextPhrase() {
+    currentPhraseIndex++;
+    if (currentPhraseIndex < phrases.length) {
+        saveAndDisplayPhrase(); // Display next phrase
+    } else {
+        alert("You've completed all phrases!");
+        currentPhraseIndex = 0; // Reset for new session
+        saveAndDisplayPhrase();
+    }
+    document.getElementById('guess-input').value = ""; // Clear input field
+}
+
+function updateScore() {
+    setText('score', `Correct: ${score.correct} | Incorrect: ${score.incorrect}`);
+}
+
   
 
 function displaySavedRules(phraseText) {
