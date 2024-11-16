@@ -42,6 +42,7 @@ function getSelectedValues(group) {
 
 function loadPhrase() {
     const filters = { case: getSelectedValues('case'), type: getSelectedValues('type') };
+    const phraseCount = parseInt(document.getElementById('phrase-count').value, 10);
 
     if (!filters.case.length || !filters.type.length) {
         return alert("Please select at least one filter in both dropdowns.");
@@ -50,16 +51,17 @@ function loadPhrase() {
     fetch('/get_random_phrase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(filters)
+        body: JSON.stringify({ case: filters.case, type: filters.type, limit: phraseCount })
     })
     .then(response => response.json())
     .then(data => {
-        phrases = shuffleArray(data.phrases);
+        phrases = shuffleArray(data.phrases).slice(0, phraseCount); // Limit to specified number of phrases
         currentPhraseIndex = 0;
         saveAndDisplayPhrase();
     })
     .catch(handleError('Error loading phrases'));
 }
+
 
 function saveAndDisplayPhrase() {
     const phrase = phrases[currentPhraseIndex];
