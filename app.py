@@ -11,6 +11,7 @@ app = Flask(__name__)
 # Load data once when the app starts
 df = pd.read_excel('data/German.xls', sheet_name='Nouns')
 fill_blanks_df = pd.read_excel('data/German.xls', sheet_name='FillBlanks')
+fill_blanks_rules_df = pd.read_excel('data/German.xls', sheet_name='FillBlanksRules')
 
 @app.route('/')
 def home():
@@ -47,10 +48,7 @@ def get_random_phrase():
     case_filter = filters.get('case', [])
     type_filter = filters.get('type', [])
 
-    # Start with the entire DataFrame
     filtered_df = fill_blanks_df
-
-    # Filter based on the case and type selections
     if case_filter:
         filtered_df = filtered_df[filtered_df['case'].isin(case_filter)]
     if type_filter:
@@ -63,8 +61,14 @@ def get_random_phrase():
 
     return jsonify({'phrases': phrases})
 
+@app.route('/get_fill_blank_rules', methods=['POST'])
+def get_fill_blank_rules():
+    rule_type = request.json.get('type')
 
+    filtered_rules = fill_blanks_rules_df[fill_blanks_rules_df['type'] == rule_type]
 
+    rules = filtered_rules.to_dict(orient='records')
+    return jsonify({'rules': rules})
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -393,3 +393,30 @@ main {
     margin-top: 5px;
 }
 
+/* Rules Table Styling */
+#rules-table {
+    width: 100%;
+    border-collapse: collapse; /* Ensures no gaps between borders */
+    margin-top: 20px;
+}
+
+#rules-table th, #rules-table td {
+    border: 1px solid #ddd; /* Adds border around cells */
+    padding: 10px;
+    text-align: left;
+}
+
+#rules-table th {
+    background-color: #f4f4f4; /* Light background for headers */
+    font-weight: bold;
+}
+
+#rules-table tr:nth-child(even) {
+    background-color: #f9f9f9; /* Alternating row colors */
+}
+
+#rules-section {
+    display: none; /* Initially hide the rules section */
+}
+
+
