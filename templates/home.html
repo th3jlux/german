@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learn German</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Welcome to German Learning App</h1>
-    <div id="categories">
-        <a href="{{ url_for('fill_blanks') }}"><button>Fill in the blanks</button></a>
-        <a href="{{ url_for('nouns') }}"><button>Genders</button></a>
-    </div>
+    <header>
+        <h1>Welcome to the German Learning App</h1>
+    </header>
+    <main>
+        <section id="categories" class="category-buttons">
+            <a href="{{ url_for('fill_blanks') }}">
+                <button>Fill in the Blanks</button>
+            </a>
+            <a href="{{ url_for('nouns') }}">
+                <button>Learn Genders</button>
+            </a>
+        </section>
+    </main>
 </body>
 </html>

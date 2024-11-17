@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fill in the Blanks</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMQ5hC+rs/z0K7r2ztjoJ7mKgrAKg1Szqrvx7tm" crossorigin="anonymous">
 </head>
 <body>
     <header class="top-menu">
@@ -15,8 +18,6 @@
                 {% endfor %}
             </div>
         </div>
-    </header>
-    <header class="top-menu">
         <div class="menu-item">
             <div id="type-dropdown">
                 <h3>Select Type</h3>
@@ -26,46 +27,259 @@
                 {% endfor %}
             </div>
         </div>
-    </header>
-        <header class="top-menu">
         <div class="menu-item">
             <div>
                 <label for="phrase-count">Number of Phrases:</label>
                 <input type="number" id="phrase-count" min="1" value="25" />
             </div>
         </div>
-    </header>
-    <header class="top-menu">
         <button class="menu-item styled-button" onclick="loadPhrase()">Load Phrase</button>
     </header>
 
     <main id="main-content" class="hidden">
-        <h1>Fill in the Blanks</h1>
-
-        <div id="display-section">
-            <div id="english-text" class="text-display"></div>
-            <div id="german-text" class="text-display"></div>
+        <div class="content-header">
+            <h1>Fill in the Blanks</h1>
+            <div id="score" class="score-display">Correct: 0 | Incorrect: 0</div>
         </div>
 
-        <div id="word-input">
-            <input type="text" id="guess-input" placeholder="Enter the correct word" />
-            <button onclick="checkAnswer()">Submit</button>
+        <div id="display-section" class="phrase-display">
+            <div id="english-text" class="text-display english"></div>
+            <div id="german-text" class="text-display german"></div>
+        </div>
+
+        <div id="word-input" class="input-section">
+            <input type="text" id="guess-input" placeholder="Enter the correct word" disabled />
+            <button class="styled-button" onclick="checkAnswer()" disabled>Submit</button>
             <p id="feedback" class="feedback"></p>
         </div>
 
-        <div id="rules-section">
-            <button id="hint-button" class="tooltip">?
-                <span class="tooltiptext">
-                    <table id="rules-table"></table>
-                </span>
-            </button>
+        <div id="rules-section" class="rules-section hidden">
+            <div class="hint-button">
+                <i class="fas fa-info-circle"></i> <span>Hint</span>
+            </div>
+            <div class="tooltiptext">
+                <table id="rules-table"></table>
+            </div>
         </div>
-
-
-
-        <div id="score" class="score-display">Correct: 0 | Incorrect: 0</div>
     </main>
 
-    <script src="{{ url_for('static', filename='js/fill_blanks.js') }}"></script>
+    <div id="completion-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Session Complete</h2>
+            <p>You've completed all phrases!</p>
+            <button class="styled-button" onclick="restartSession()">Restart</button>
+        </div>
+    </div>
+
+    <script>
+        let correctArticle = "";  
+        let score = { correct: 0, incorrect: 0 };  
+        let phrases = [];  
+        let currentPhraseIndex = 0;  
+        let savedRules = {};  // Store rules for each phrase
+        let answeredIncorrectly = false; // Track if the current phrase was answered incorrectly
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupCheckboxGroups(['case', 'type']);
+            setupEnterKeyListener('guess-input', checkAnswer);
+        });
+
+        function setupCheckboxGroups(groups) {
+            groups.forEach(group => {
+                const selectAll = document.getElementById(`${group}-select-all`);
+                const checkboxes = document.querySelectorAll(`input[name="${group}"]`);
+
+                selectAll.addEventListener('change', () => {
+                    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+                });
+
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', () => {
+                        selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
+                    });
+                });
+            });
+        }
+
+        function setupEnterKeyListener(inputId, callback) {
+            document.getElementById(inputId).addEventListener('keypress', event => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    callback();
+                }
+            });
+        }
+
+        function getSelectedValues(group) {
+            return Array.from(document.querySelectorAll(`input[name="${group}"]:checked`))
+                .map(cb => cb.value);
+        }
+
+        function loadPhrase() {
+            clearFeedbackAndScore();
+            const filters = { case: getSelectedValues('case'), type: getSelectedValues('type') };
+            const phraseCount = parseInt(document.getElementById('phrase-count').value, 10);
+
+            if (!filters.case.length || !filters.type.length) {
+                return alert("Please select at least one filter in both dropdowns.");
+            }
+
+            fetch('/get_random_phrase', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ case: filters.case, type: filters.type, limit: phraseCount })
+            })
+            .then(response => response.json())
+            .then(data => {
+                phrases = shuffleArray(data.phrases).slice(0, phraseCount); // Limit to specified number of phrases
+                currentPhraseIndex = 0;
+                answeredIncorrectly = false;
+                saveAndDisplayPhrase();
+                toggleInput(true);  // Enable input when phrases are loaded
+            })
+            .catch(handleError('Error loading phrases'));
+        }
+
+        function saveAndDisplayPhrase() {
+            const phrase = phrases[currentPhraseIndex];
+            if (!phrase) return;
+
+            setText('english-text', phrase.english);
+            setText('german-text', phrase.german);
+            correctArticle = phrase.article;
+
+            fetch('/get_fill_blank_rules', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: phrase.type })
+            })
+            .then(response => response.json())
+            .then(data => {
+                savedRules[phrase.german] = data.rules;  // Save rules for the current phrase
+                toggleVisibility('main-content', true);
+            })
+            .catch(handleError("Error fetching rules"));
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('guess-input').value.trim();
+            const feedback = document.getElementById('feedback');
+            const englishText = document.getElementById('english-text').textContent;
+            const germanText = document.getElementById('german-text').textContent;
+
+            const correctSentence = germanText.replace('[ ]', `<b><u>${correctArticle}</u></b>`);
+            const userSentence = germanText.replace('[ ]', `<b><u>${input || "(nothing)"}</u></b>`);
+
+            if (input === correctArticle) {
+                if (!answeredIncorrectly) {
+                    score.correct++;
+                }
+                feedback.className = "feedback correct";
+                feedback.innerHTML = `
+                    <span style="color: green;"><em>Correct!</em></span><br>
+                    <em>The English sentence was: ${englishText}</em><br>
+                    <em>You correctly entered: ${correctSentence}</em>
+                `;
+
+                updateScore();
+                toggleVisibility('rules-section', false); // Hide the rules section after a correct answer
+                setTimeout(nextPhrase, 1500);  // Add a delay before moving to the next phrase
+            } else {
+                if (!answeredIncorrectly) {
+                    score.incorrect++;
+                    answeredIncorrectly = true;
+                }
+                feedback.className = "feedback incorrect";
+                feedback.innerHTML = `
+                    <span style="color: red;"><em>Incorrect. Try Again</em></span><br>
+                `;
+
+                updateScore();
+                displaySavedRules(germanText);  // Display rules for the current phrase
+            }
+        }
+
+        function nextPhrase() {
+            if (++currentPhraseIndex < phrases.length) {
+                answeredIncorrectly = false;
+                saveAndDisplayPhrase();
+            } else {
+                toggleVisibility('completion-modal', true);
+                toggleInput(false);  // Disable input when session is complete
+            }
+            document.getElementById('guess-input').value = ""; 
+        }
+
+        function restartSession() {
+            clearFeedbackAndScore();
+            currentPhraseIndex = 0;
+            score = { correct: 0, incorrect: 0 };
+            toggleVisibility('completion-modal', false);
+            loadPhrase();  // Fetch new phrases on restart
+            updateScore();
+        }
+
+        function updateScore() {
+            setText('score', `Correct: ${score.correct} | Incorrect: ${score.incorrect}`);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function setText(id, text) {
+            document.getElementById(id).textContent = text;
+        }
+
+        function toggleVisibility(id, show) {
+            document.getElementById(id).style.display = show ? 'block' : 'none';
+        }
+
+        function toggleInput(enable) {
+            document.getElementById('guess-input').disabled = !enable;
+            document.querySelector('#word-input button').disabled = !enable;
+        }
+
+        function handleError(message) {
+            return (error) => {
+                console.error(message, error);
+                alert(message);
+            };
+        }
+
+        function clearFeedbackAndScore() {
+            setText('feedback', '');
+            score = { correct: 0, incorrect: 0 };
+            updateScore();
+        }
+
+        function displaySavedRules(phraseText) {
+            const rules = savedRules[phraseText] || [];
+            const table = document.getElementById('rules-table');
+
+            table.innerHTML = `
+                <tr>
+                    <th><em>Case</em></th>
+                    <th><em>Masculine</em></th>
+                    <th><em>Feminine</em></th>
+                    <th><em>Neuter</em></th>
+                    <th><em>Plural</em></th>
+                </tr>
+                ${rules.map(rule => `
+                    <tr class="rule-row">
+                        <td><em>${rule.case}</em></td>
+                        <td><em>${rule.masculine}</em></td>
+                        <td><em>${rule.feminine}</em></td>
+                        <td><em>${rule.neuter}</em></td>
+                        <td><em>${rule.plural}</em></td>
+                    </tr>`).join('')}
+            `;
+            toggleVisibility('rules-section', true);
+        }
+    </script>
 </body>
 </html>

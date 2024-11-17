@@ -2,17 +2,22 @@ from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import re
 
+# Define helper function
+
 def sort_key(value):
     numbers = re.findall(r'\d+', value)
     return (int(numbers[0]) if numbers else float('inf'), value)
 
+# Initialize Flask app
 app = Flask(__name__)
 
 # Load data once when the app starts
-df = pd.read_excel('data/German.xls', sheet_name='Nouns')
-fill_blanks_df = pd.read_excel('data/German.xls', sheet_name='FillBlanks')
-fill_blanks_rules_df = pd.read_excel('data/German.xls', sheet_name='FillBlanksRules')
+data_file = 'data/German.xls'
+df = pd.read_excel(data_file, sheet_name='Nouns')
+fill_blanks_df = pd.read_excel(data_file, sheet_name='FillBlanks')
+fill_blanks_rules_df = pd.read_excel(data_file, sheet_name='FillBlanksRules')
 
+# Define routes
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -26,14 +31,7 @@ def nouns():
 def get_words():
     selected_categories = request.json.get('categories', [])
     filtered_df = df[df['category'].isin(selected_categories)]
-    words = [
-        {
-            "english": row['english'],
-            "german": row['german'],
-            "gender": row['gender']
-        }
-        for _, row in filtered_df.iterrows()
-    ]
+    words = filtered_df[['english', 'german', 'gender']].to_dict(orient='records')
     return jsonify(words)
 
 @app.route('/fill_blanks')
@@ -54,21 +52,16 @@ def get_random_phrase():
     if type_filter:
         filtered_df = filtered_df[filtered_df['type'].isin(type_filter)]
 
-    if not filtered_df.empty:
-        phrases = filtered_df.to_dict(orient='records')
-    else:
-        phrases = []
-
+    phrases = filtered_df.to_dict(orient='records') if not filtered_df.empty else []
     return jsonify({'phrases': phrases})
 
 @app.route('/get_fill_blank_rules', methods=['POST'])
 def get_fill_blank_rules():
     rule_type = request.json.get('type')
-
     filtered_rules = fill_blanks_rules_df[fill_blanks_rules_df['type'] == rule_type]
-
     rules = filtered_rules.to_dict(orient='records')
     return jsonify({'rules': rules})
 
+# Run the app
 if __name__ == '__main__':
     app.run(debug=True)
