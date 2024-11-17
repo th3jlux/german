@@ -419,4 +419,62 @@ main {
     display: none; /* Initially hide the rules section */
 }
 
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: auto; /* Allow dynamic width */
+  max-width: 400px; /* Set a reasonable maximum width */
+  background-color: black;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  overflow: auto; /* Add scroll if table is too wide */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Add shadow for better visibility */
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+#rules-table {
+  width: 100%; /* Ensure table takes full width of tooltip */
+  border-collapse: collapse;
+}
+
+#rules-table th, #rules-table td {
+  border: 1px solid #ddd; /* Add borders for better readability */
+  padding: 5px;
+  text-align: center; /* Center-align table content */
+  color: white; /* Ensure text is visible on dark background */
+}
+
+#rules-table th {
+  background-color: #333; /* Darker background for headers */
+  font-weight: bold;
+}
+
+#rules-table tr:nth-child(even) {
+  background-color: #444; /* Alternate row colors for readability */
+}
+
+#rules-table tr:nth-child(odd) {
+  background-color: #555;
+}
+
+#rules-table tr:hover {
+  background-color: #666; /* Highlight row on hover */
+}
+}
+
 
